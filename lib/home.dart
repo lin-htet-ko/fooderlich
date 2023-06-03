@@ -1,49 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:fooderlich/card1.dart';
-
-import 'card2.dart';
-import 'card3.dart';
+import 'package:fooderlich/models/models.dart';
+import 'package:fooderlich/screens/explore_screen.dart';
+import 'package:fooderlich/screens/recipes_screen.dart';
+import 'package:fooderlich/screens/grocery_screen.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  HomeState createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
-  int _selectedIndex = 0;
-  var pages = [Card1(), Card2(), Card3()];
-
-  void onTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class HomeState extends State<Home> {
+  static List<Widget> pages = <Widget>[
+    ExploreScreen(),
+    RecipesScreen(),
+    GroceryScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Fooderlich",
-          style: Theme.of(context).textTheme.headline6,
+    return Consumer<TabManager>(builder: (con, tabManager, child) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Fooderlich',
+            style: Theme.of(context).textTheme.headline6,
+          ),
         ),
-      ),
-      body: pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: onTap,
-        selectedItemColor: Theme.of(context).textSelectionTheme.selectionColor,
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.card_giftcard), label: "Card1"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.card_giftcard), label: "Card2"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.card_giftcard), label: "Card3"),
-        ],
-      ),
-    );
+        body: IndexedStack(index: tabManager.selectedTab,children: pages,),
+        bottomNavigationBar: BottomNavigationBar(
+          selectedItemColor:
+              Theme.of(context).textSelectionTheme.selectionColor,
+          currentIndex: tabManager.selectedTab,
+          onTap: (index) {
+            tabManager.goToTab(index);
+          },
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.explore),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book),
+              label: 'Recipes',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: 'To Buy',
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
